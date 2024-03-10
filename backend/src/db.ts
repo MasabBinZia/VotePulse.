@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
+import { config } from 'dotenv';
+config(); 
 
 const dbURL = process.env.MONGODB_URL;
+console.log(dbURL,'URL');
+
 
 if (!dbURL) {
   console.error("MONGODB_URL environment variable is not defined");
