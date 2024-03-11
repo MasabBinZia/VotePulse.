@@ -1,38 +1,37 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Model, Schema } from "mongoose";
 import bcrypt from "bcrypt";
-
-export interface IUser extends Document {
-  name: string;
-  email?: string;
-  address: string;
-  password: string;
-  cnicNumber: string;
-  role: "voter" | "admin";
-  isVoted: boolean;
-  comparePassword(candidatePassword: string): Promise<boolean>;
-}
+import { IUser } from "../utils/interfaces";
 
 const userSchema: Schema<IUser> = new mongoose.Schema({
   name: {
     type: String,
     required: true,
   },
+  age: {
+    type: Number,
+    required: true,
+  },
+
   email: {
+    type: String,
+  },
+  mobile: {
     type: String,
   },
   address: {
     type: String,
     required: true,
   },
+  cnicNumber: {
+    type: Number,
+    required: true,
+    unique: true,
+  },
   password: {
     type: String,
     required: true,
   },
-  cnicNumber: {
-    type: String,
-    required: true,
-    unique: true,
-  },
+
   role: {
     type: String,
     enum: ["voter", "admin"],
@@ -58,5 +57,5 @@ userSchema.methods.comparePassword = async function (
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-const User = mongoose.model("User", userSchema);
+const User: Model<IUser> = mongoose.model<IUser>("User", userSchema);
 export { User };

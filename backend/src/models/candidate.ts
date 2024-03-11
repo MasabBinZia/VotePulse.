@@ -1,6 +1,19 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Model } from "mongoose";
+import { ICandidate, IVote } from "../utils/interfaces";
 
-const candidateSchema = new mongoose.Schema({
+const voteSchema = new Schema<IVote>({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  votedAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+const candidateSchema: Schema<ICandidate> = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -13,24 +26,16 @@ const candidateSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  votes: [
-    {
-      user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-      },
-      votedAt: {
-        type: Date,
-        default: Date.now(),
-      },
-    },
-  ],
+  votes: [voteSchema],
   voteCount: {
     type: Number,
     default: 0,
   },
 });
 
-const Candidate = mongoose.model("Candidate", candidateSchema);
+const Candidate: Model<ICandidate> = mongoose.model<ICandidate>(
+  "Candidate",
+  candidateSchema
+);
+
 export { Candidate };

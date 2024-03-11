@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import { userRoutes } from "./routes/userRoutes";
 import { connectDB } from "./db";
 import dotenv from "dotenv";
+import { candidateRoutes } from "./routes/candidateRoutes";
 
 dotenv.config();
 
@@ -12,15 +13,17 @@ const PORT = process.env.PORT || 3001; // Ensure this is consistent with your lo
 app.use(bodyParser.json());
 
 // Define your routes
-app.use("/users", userRoutes);
+app.use("/user", userRoutes);
+app.use("/candidate", candidateRoutes);
 
 // Connect to the database before starting the server
-connectDB().then(() => {
-  console.log("Connected to MongoDB Server");
-  app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server listening on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Database connection failed", err);
+    process.exit(1); // Optionally exit if database connection cannot be established
   });
-}).catch((err) => {
-  console.error("Database connection failed", err);
-  process.exit(1); // Optionally exit if database connection cannot be established
-});

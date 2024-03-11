@@ -1,5 +1,8 @@
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const jwtAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
   // Checking Authorized or not
