@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Response } from "express";
 import { User } from "../models/user";
 import { jwtAuthMiddleware } from "../jwt";
 import { Candidate } from "../models/candidate";
@@ -8,11 +8,12 @@ const router = express.Router();
 
 app.use(express.json());
 
-const checkAdminRole = async (userId: any) => {
+const checkAdminRole = async (userId: Number): Promise<boolean> => {
   try {
     const user = await User.findById(userId);
     return user?.role === "admin";
   } catch (err) {
+    console.error(err);
     return false;
   }
 };
@@ -39,7 +40,7 @@ router.put(
   jwtAuthMiddleware,
   async (req: any, res: Response) => {
     try {
-      if (!checkAdminRole(req.user.id))
+      if (!(await checkAdminRole(req.user.id)))
         return res.status(403).json({ message: "User has no Admin Role" });
 
       const candidateId = req.params.candidateID;
@@ -69,7 +70,7 @@ router.delete(
   jwtAuthMiddleware,
   async (req: any, res: Response) => {
     try {
-      if (!checkAdminRole(req.user.id))
+      if (!(await checkAdminRole(req.user.id)))
         return res.status(403).json({ message: "User has no Admin Role" });
 
       const candidateId = req.params.candidateID;
@@ -112,7 +113,7 @@ router.post(
         res.status(403).json({ message: "Admin is not allowed to voted" });
       }
 
-      candidate.votes.push({ user: userId });
+      candidate.votes.push({ user: userId, votedAt: new Date() });
       candidate.voteCount++;
       await candidate.save();
 
@@ -127,6 +128,31 @@ router.post(
   }
 );
 
+router.get("/vote/count", async (req: any, res: Response) => {
+  try {
+    const candidate = await Candidate.find().sort({ voteCount: "desc" });
+    const voteRecord = candidate.map((data) => {
+      return {
+        party: data.party,
+        count: data.voteCount,
+      };
+    });
 
+    return res.status(200).json(voteRecord);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.get("/", async (req: any, res: Response) => {
+  try {
+    const candidates = await Candidate.find({}, "name party -_id");
+    res.status(200).json(candidates);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 export { router as candidateRoutes };
