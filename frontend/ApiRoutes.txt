@@ -1,0 +1,54 @@
+http://localhost:3000/user/profile GET access profile
+
+
+http://localhost:3000/user/login POST
+{
+"currentPassword": password123,
+"newPassword": "asdsda"
+},
+
+http://localhost:3000/user/profile/password PUT
+{
+"cnicNumber": 123456789012,
+"password": "password123"
+},
+
+
+http://localhost:3000/user/signup POST
+takes body as request 
+{
+"name": "Masab",
+"age": 22,
+"mobile": "9876543210",
+"email": "masab@example.com",
+"address": "123, ABC Street, XYZ City",
+"cnicNumber": 123456789012,
+"password": "password123"
+"role" :"voter"?
+},
+
+
+http://localhost:3000/candidate/signup POST 
+takes body as request 
+ {
+"name": "Imran Khan",
+"party": "PTO",
+"age": 71
+},
+
+
+http://localhost:3000/candidate/vote/count GET total votes for Party
+
+
+
+http://localhost:3000/candidate GET All Candidates 
+
+
+http://localhost:3000/candidate/vote/id POST candidate ID to vote
+
+
+http://localhost:3000/candidate/id PUT to update candidate
+
+http://localhost:3000/candidate/id DELETE to delete candidate
+
+

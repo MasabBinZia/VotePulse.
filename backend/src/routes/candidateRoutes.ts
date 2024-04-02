@@ -19,7 +19,7 @@ const checkAdminRole = async (userId: Number): Promise<boolean> => {
 };
 
 // SignUp
-router.post("/", jwtAuthMiddleware, async (req: any, res: Response) => {
+router.post("/signup", jwtAuthMiddleware, async (req: any, res: Response) => {
   try {
     if (!(await checkAdminRole(req.user.id)))
       return res.status(403).json({ message: "User has no Admin Role" });

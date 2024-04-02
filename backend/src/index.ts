@@ -4,11 +4,13 @@ import { userRoutes } from "./routes/userRoutes";
 import { connectDB } from "./db";
 import dotenv from "dotenv";
 import { candidateRoutes } from "./routes/candidateRoutes";
-
+import cors from "cors"
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001; // Ensure this is consistent with your logging
+const PORT = 3001; 
+
+app.use(cors()); 
 
 app.use(bodyParser.json());
 
