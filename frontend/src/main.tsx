@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import CandidatesPage from "./pages/Candidates";
 import { SiteHeader } from "./components/Header";
+import UserAuthPage from "./pages/UserAuthPage";
 
 const router = createBrowserRouter([
   {
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
   {
     path: "/candidates",
     element: <CandidatesPage />,
+  },
+  {
+    path: "/user-auth",
+    element: <UserAuthPage />,
   },
 ]);
 

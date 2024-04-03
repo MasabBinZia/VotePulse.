@@ -26,6 +26,14 @@ const candidateSchema: Schema<ICandidate> = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  politicalFlagUrl: {
+    type: String,
+    reqired: true,
+  },
+  politicalSymbolUrl: {
+    type: String,
+    reqired: true,
+  },
   votes: [voteSchema],
   voteCount: {
     type: Number,

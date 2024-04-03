@@ -30,7 +30,7 @@ export default function CandidatesPage() {
   }, []);
 
   return (
-    <>
+    <main>
       {candidateData.length > 0 ? (
         <div>
           {candidateData.map((candidate, index) => (
@@ -42,6 +42,6 @@ export default function CandidatesPage() {
       ) : (
         <p>No candidates found.</p>
       )}
-    </>
+    </main>
   );
 }

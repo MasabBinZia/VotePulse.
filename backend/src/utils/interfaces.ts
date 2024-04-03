@@ -8,6 +8,8 @@ export interface IVote {
 export interface ICandidate extends Document {
   name: string;
   party: string;
+  politicalSymbolUrl: string;
+  politicalFlagUrl: string;
   age: number;
   votes: IVote[];
   voteCount: number;
