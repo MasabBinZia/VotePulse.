@@ -1,41 +1,20 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import HomePage from "./pages/Home";
 import "./index.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import CandidatesPage from "./pages/Candidates";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { RouterProvider } from "react-router-dom";
 import { SiteHeader } from "./components/Header";
-import UserAuthPage from "./pages/UserAuthPage";
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <HomePage />,
-  },
-  {
-    path: "/candidates",
-    element: <CandidatesPage />,
-  },
-  {
-    path: "/user-auth",
-    element: <UserAuthPage />,
-  },
-]);
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 0,
-    },
-  },
-});
+import AuthProvider from "./Providers/AuthProvider";
+import { router } from "./utils/router";
+import { queryClient } from "./utils/query-client";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <SiteHeader />
-      <RouterProvider router={router} />
+      <AuthProvider isSignedIn={false}>
+        <SiteHeader />
+        <RouterProvider router={router} />
+      </AuthProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );
