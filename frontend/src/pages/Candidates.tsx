@@ -9,7 +9,8 @@ export default function CandidatesPage() {
   const [candidateData, setCandidateData] = useState<Candidate[]>([]);
 
   const getData = async () => {
-    const URL = `http://localhost:3001/candidate`;
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
+    const URL = `${BASE_URL}/candidate`;
     try {
       const response = await fetch(URL);
       if (!response.ok) {

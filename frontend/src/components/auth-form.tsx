@@ -2,7 +2,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -11,12 +10,39 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "./ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { formSchema } from "@/utils/formsSchema";
+import { AuthFormTypes } from "@/utils/types/types";
 
-type AuthForm = {
-  formType: "Admin" | "Voter";
-};
+function onSubmit(values: z.infer<typeof formSchema>) {
+  console.log(values);
+}
 
-export default function AuthForm({ formType }: AuthForm) {
+export default function AuthForm({ formType }: AuthFormTypes) {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      age: "",
+      cparty: "",
+      cnicNumber: "",
+      password: "",
+      mobileNumber: "",
+      email: "",
+      address: "",
+      role: "voter",
+    },
+  });
   if (formType == "Admin") {
     return (
       <Card>
@@ -27,27 +53,58 @@ export default function AuthForm({ formType }: AuthForm) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
-          <div className="space-y-1">
-            <Label htmlFor="Cname">Candidate FullName</Label>
-            <Input id="Cname" placeholder="Imran Khan" />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="Cage">Candidate Age</Label>
-            <Input id="Cage" placeholder="71" />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="Cparty">Candidate Party</Label>
-            <Input id="Cparty" placeholder="PTI" />
-          </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Candidate FullName</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Imran Khan" {...field} />
+                    </FormControl>
+                    <FormMessage className="font-bold" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="age"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Candidate Age</FormLabel>
+                    <FormControl>
+                      <Input placeholder="79" type="number" {...field} />
+                    </FormControl>
+                    <FormMessage className="font-bold" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="cparty"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Candidate Party</FormLabel>
+                    <FormControl>
+                      <Input id="Cparty" placeholder="PTI" {...field} />
+                    </FormControl>
+                    <FormMessage className="font-bold" />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full my-4">
+                Sign Up
+              </Button>
+            </form>
+          </Form>
         </CardContent>
-        <CardFooter>
-          <Button>Sign Up</Button>
-        </CardFooter>
       </Card>
     );
   } else {
     return (
-      <Tabs defaultValue="login" className="w-[400px]">
+      <Tabs defaultValue="login" className="w-[600px]">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="login">Login</TabsTrigger>
           <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -61,18 +118,38 @@ export default function AuthForm({ formType }: AuthForm) {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div className="space-y-1">
-                <Label htmlFor="cnic-number">CNIC Number</Label>
-                <Input id="cnic-number" placeholder="056418715" />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" placeholder="********" />
-              </div>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                  <FormField
+                    control={form.control}
+                    name="cnicNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>CNIC Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="12345-1234567-1" {...field} />
+                        </FormControl>
+                        <FormMessage className="font-bold" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input placeholder="********" {...field} />
+                        </FormControl>
+                        <FormMessage className="font-bold" />
+                      </FormItem>
+                    )}
+                  />
+                  <Button className="w-full my-4">Login</Button>
+                </form>
+              </Form>
             </CardContent>
-            <CardFooter>
-              <Button>Login</Button>
-            </CardFooter>
           </Card>
         </TabsContent>
         <TabsContent value="signup">
@@ -85,51 +162,127 @@ export default function AuthForm({ formType }: AuthForm) {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div className="space-y-1">
-                <Label htmlFor="name">FullName</Label>
-                <Input id="name" placeholder="Masab Bin Zia" />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="age">Age</Label>
-                <Input id="age" placeholder="22" />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="mobile">Mobile Number</Label>
-                <Input id="mobile" placeholder="05151254874" />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="xyz132@gmail.com" />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="address">Address</Label>
-                <Input id="address" placeholder="Xyz,Abc,Street,Pakistan" />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="cnic-number">Cnic Number</Label>
-                <Input id="cnic-number" placeholder="05185155" />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" placeholder="password12121" />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="roles">Role</Label>
-                <RadioGroup defaultValue="voter" className="flex">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="voter" id="r1" />
-                    <Label htmlFor="r1">Voter</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="candidate" id="r2" />
-                    <Label htmlFor="r2">Candidate</Label>
-                  </div>
-                </RadioGroup>
-              </div>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>FullName</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Masab Bin Zia" {...field} />
+                        </FormControl>
+                        <FormMessage className="font-bold" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="age"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Candidate Age</FormLabel>
+                        <FormControl>
+                          <Input placeholder="79" type="number" {...field} />
+                        </FormControl>
+                        <FormMessage className="font-bold" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="mobileNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mobile Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="+92-1234567891" {...field} />
+                        </FormControl>
+                        <FormMessage className="font-bold" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="axas@gmail.com" {...field} />
+                        </FormControl>
+                        <FormMessage className="font-bold" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="123 Example Street, City, Country"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="font-bold" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="cnicNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>CNIC Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="12345-1234567-1" {...field} />
+                        </FormControl>
+                        <FormMessage className="font-bold" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input placeholder="********" {...field} />
+                        </FormControl>
+                        <FormMessage className="font-bold" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Role</FormLabel>
+                        <FormControl>
+                          <RadioGroup defaultValue="voter" {...field}>
+                            <RadioGroupItem value="voter" id="voter" />
+                            <Label htmlFor="voter">Voter</Label>
+                            <RadioGroupItem value="candidate" id="candidate" />
+                            <Label htmlFor="candidate">Candidate</Label>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage className="font-bold" />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full my-4">
+                    Sign Up
+                  </Button>
+                </form>
+              </Form>
             </CardContent>
-            <CardFooter>
-              <Button>Sign Up</Button>
-            </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>
