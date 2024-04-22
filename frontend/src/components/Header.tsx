@@ -29,9 +29,6 @@ export function MainNav() {
           VotePulse.
         </span>
       </a>
-      {/* <div className="md:hidden hidden lg:block">
-          <NavMenu />
-        </div> */}
       <nav className="gap-6 hidden lg:flex">
         <a
           key={""}
@@ -42,14 +39,14 @@ export function MainNav() {
         </a>
         <a
           key={""}
-          href={"/profile"}
+          href={"/party"}
           className={"flex items-center text-lg font-medium "}
         >
           Party
         </a>
         <a
           key={""}
-          href={"/home"}
+          href={"/votes"}
           className={"flex items-center text-lg font-medium "}
         >
           Votes

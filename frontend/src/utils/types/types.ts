@@ -1,4 +1,3 @@
 export type AuthFormTypes = {
-    formType: "Admin" | "Voter";
-  };
-  
+  formType: "Admin" | "Voter";
+};

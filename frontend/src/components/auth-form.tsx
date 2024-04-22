@@ -5,7 +5,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -222,7 +221,7 @@ export default function AuthForm({ formType }: AuthFormTypes) {
                     name="address"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>Address</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="123 Example Street, City, Country"
@@ -259,7 +258,7 @@ export default function AuthForm({ formType }: AuthFormTypes) {
                       </FormItem>
                     )}
                   />
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="role"
                     render={({ field }) => (
@@ -274,6 +273,40 @@ export default function AuthForm({ formType }: AuthFormTypes) {
                           </RadioGroup>
                         </FormControl>
                         <FormMessage className="font-bold" />
+                      </FormItem>
+                    )}
+                  /> */}
+                  <FormField
+                    control={form.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem className="space-y-3">
+                        <FormLabel>Role</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex"
+                          >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="voter" />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                Voter
+                              </FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="candidate" />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                Candidate
+                              </FormLabel>
+                            </FormItem>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />

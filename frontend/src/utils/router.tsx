@@ -1,4 +1,4 @@
-import ProtectedRoute from "@/components/ProtectedRoute";
+// import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminAuthPage from "@/pages/AdminAuthPage";
 import CandidatesPage from "@/pages/Candidates";
 import HomePage from "@/pages/Home";
@@ -13,9 +13,9 @@ export const router = createBrowserRouter([
   {
     path: "/candidates",
     element: (
-      <ProtectedRoute>
-        <CandidatesPage />
-      </ProtectedRoute>
+      // <ProtectedRoute>
+      <CandidatesPage />
+      // </ProtectedRoute>
     ),
   },
   {
@@ -25,5 +25,13 @@ export const router = createBrowserRouter([
   {
     path: "/admin-auth",
     element: <AdminAuthPage />,
+  },
+  {
+    path: "/party",
+    element: <>party</>,
+  },
+  {
+    path: "/votes",
+    element: <>votes</>,
   },
 ]);
