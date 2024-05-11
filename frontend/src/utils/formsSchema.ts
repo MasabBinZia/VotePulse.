@@ -42,7 +42,6 @@ export const formSchema = z.object({
   ),
   mobileNumber: z.string().refine(
     (value) => {
-      // Mobile number should have exactly 9 digits
       const mobileRegex = /^\d{10}$/;
       return mobileRegex.test(value);
     },
