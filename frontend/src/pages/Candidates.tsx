@@ -1,5 +1,8 @@
-import { useState, useEffect } from "react";
+import { useAuth } from "@/Providers/AuthProvider";
 import { BASE_URL } from "../../envConstants";
+import { useQuery } from "@tanstack/react-query";
+
+const URL = `${BASE_URL}/candidate`;
 
 type Candidate = {
   name: string;
@@ -7,49 +10,32 @@ type Candidate = {
 };
 
 export default function CandidatesPage() {
-  const [candidateData, setCandidateData] = useState<Candidate[]>([]);
-  const [loading, setLoading] = useState(true);
+  const auth = useAuth();
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["candidates"],
+    queryFn: () => fetch(URL).then((res) => res.json()),
+  });
 
-  const getData = async () => {
-    const URL = `${BASE_URL}/candidate`;
-    try {
-      const response = await fetch(URL);
-      if (!response.ok) {
-        throw new Error(
-          `HTTP error! Status: ${response.status} ${response.statusText}`
-        );
-      }
-      const result = await response.json();
-      // console.log("Fetched data:", result);
-      setCandidateData(result);
-    } catch (error) {
-      console.error("Failed to fetch data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Check if the user is not logged in
+  // if (!auth?.user) {
+  //   return <p>You must be logged in to view this page.</p>;
+  // }
 
-  useEffect(() => {
-    getData();
-  }, []);
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error loading candidates.</p>;
+
   return (
     <main>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <>
-          {candidateData.length > 0 ? (
-            <div>
-              {candidateData.map((candidate, index) => (
-                <div key={index}>
-                  {candidate.name} - {candidate.party}
-                </div>
-              ))}
+      {data && data.length > 0 ? (
+        <div>
+          {data.map((candidate: Candidate, index: number) => (
+            <div key={index}>
+              {candidate.name} - {candidate.party}
             </div>
-          ) : (
-            <p>No candidates found.</p>
-          )}
-        </>
+          ))}
+        </div>
+      ) : (
+        <p>No candidates found.</p>
       )}
     </main>
   );

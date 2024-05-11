@@ -3,14 +3,14 @@ http://localhost:3000/user/profile GET access profile
 
 http://localhost:3000/user/login POST
 {
-"currentPassword": password123,
-"newPassword": "asdsda"
+"cnicNumber": 123456789012,
+"password": "password123"
 },
 
 http://localhost:3000/user/profile/password PUT
 {
-"cnicNumber": 123456789012,
-"password": "password123"
+"currentPassword": password123,
+"newPassword": "asdsda"
 },
 
 
