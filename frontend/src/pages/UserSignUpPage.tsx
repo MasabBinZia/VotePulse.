@@ -19,7 +19,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -80,8 +79,13 @@ export default function UserSignUpPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
+      age: "",
       cnicNumber: "",
       password: "",
+      mobileNumber: "",
+      email: "",
+      address: "",
     },
   });
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -200,6 +204,14 @@ export default function UserSignUpPage() {
               <Button type="submit" className="w-full my-4">
                 Sign Up
               </Button>
+              <Link
+                className={`${buttonVariants({
+                  variant: "outline",
+                })} w-full text-center py-2 rounded-lg`}
+                to={"/user-login"}
+              >
+                Login
+              </Link>
             </form>
           </Form>
         </CardContent>
