@@ -28,7 +28,7 @@ const formSchema = z.object({
   ),
 });
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -47,6 +47,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 export default function UserLoginPage() {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -105,9 +106,14 @@ export default function UserLoginPage() {
                 <Button type="submit" className="w-full">
                   Submit
                 </Button>
-                <Button variant={"secondary"} className="w-full">
+                <Link
+                  className={`${buttonVariants({
+                    variant: "outline",
+                  })} w-full text-center py-2 rounded-lg`}
+                  to={"/user-signup"}
+                >
                   Sign Up
-                </Button>
+                </Link>
               </div>
             </form>
           </Form>

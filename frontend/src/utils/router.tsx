@@ -3,6 +3,7 @@ import AdminAuthPage from "@/pages/AdminAuthPage";
 import CandidatesPage from "@/pages/Candidates";
 import HomePage from "@/pages/Home";
 import UserLoginPage from "@/pages/UserLoginPage";
+import UserSignUpPage from "@/pages/UserSignUpPage";
 import { createBrowserRouter } from "react-router-dom";
 
 export const router = createBrowserRouter([
@@ -24,7 +25,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/user-signup",
-    element: <UserLoginPage />,
+    element: <UserSignUpPage />,
   },
   {
     path: "/admin-auth",
