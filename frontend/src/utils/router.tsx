@@ -1,9 +1,12 @@
-// import ProtectedRoute from "@/components/ProtectedRoute";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminAuthPage from "@/pages/AdminAuthPage";
 import CandidatesPage from "@/pages/Candidates";
 import HomePage from "@/pages/Home";
+import Profile from "@/pages/Profile";
 import UserLoginPage from "@/pages/UserLoginPage";
 import UserSignUpPage from "@/pages/UserSignUpPage";
+import VoteNow from "@/pages/VoteNow";
+import Votes from "@/pages/Votes";
 import { createBrowserRouter } from "react-router-dom";
 
 export const router = createBrowserRouter([
@@ -12,11 +15,19 @@ export const router = createBrowserRouter([
     element: <HomePage />,
   },
   {
+    path: "/profile",
+    element: <Profile />,
+  },
+  {
     path: "/candidates",
+    element: <CandidatesPage />,
+  },
+  {
+    path: "/vote",
     element: (
-      // <ProtectedRoute>
-      <CandidatesPage />
-      // </ProtectedRoute>
+      <ProtectedRoute>
+        <VoteNow />
+      </ProtectedRoute>
     ),
   },
   {
@@ -37,6 +48,6 @@ export const router = createBrowserRouter([
   },
   {
     path: "/votes",
-    element: <>votes</>,
+    element: <Votes/>,
   },
 ]);

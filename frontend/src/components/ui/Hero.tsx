@@ -3,7 +3,7 @@ import { buttonVariants } from "./button";
 
 export default function Hero() {
   return (
-    <section className="h-screen flex justify-center items-center">
+    <section className="py-20 flex justify-center items-center">
       <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
         <h1 className="font-bold text-3xl sm:text-5xl md:text-6xl lg:text-7xl">
           Welcome To VotePulse.
@@ -13,7 +13,7 @@ export default function Hero() {
           democracy directly to your fingertips.
         </p>
         <div className="space-x-4">
-          <a href="/login" className={cn(buttonVariants({ size: "lg" }))}>
+          <a href="/vote" className={cn(buttonVariants({ size: "lg" }))}>
             Vote Now
           </a>
           <a

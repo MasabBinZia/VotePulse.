@@ -11,7 +11,7 @@ import { queryClient } from "./utils/query-client";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <AuthProvider isSignedIn={false}>
+      <AuthProvider>
         <SiteHeader />
         <RouterProvider router={router} />
       </AuthProvider>

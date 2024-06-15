@@ -1,5 +1,7 @@
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { GithubIcon, User } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function SiteHeader() {
   return (
@@ -8,12 +10,16 @@ export function SiteHeader() {
         <MainNav />
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-1">
-            <a href="/login" className={cn(buttonVariants({ size: "icon" }))}>
-              G
+            <a
+              href=""
+              className={cn(
+                buttonVariants({ size: "icon" }),
+                "w-10 h-10 p-1 rounded-full"
+              )}
+            >
+              <GithubIcon className="" />
             </a>
-            <a href="/login" className={cn(buttonVariants({ size: "icon" }))}>
-              L
-            </a>
+            <ProfileMenu />
           </nav>
         </div>
       </div>
@@ -53,5 +59,42 @@ export function MainNav() {
         </a>
       </nav>
     </div>
+  );
+}
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/Providers/AuthProvider";
+
+function ProfileMenu() {
+  const { user, logout } = useAuth();
+
+  if (!user) {
+    return null;
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Avatar>
+          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <a href="/profile">Profile</a>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

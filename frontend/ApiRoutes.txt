@@ -1,7 +1,7 @@
-http://localhost:3000/user/profile GET access profile
+http://localhost:3000/user/profile GET access profile DONE
 
 
-http://localhost:3000/user/login POST
+http://localhost:3000/user/login POST DONE
 {
 "cnicNumber": 123456789012,
 "password": "password123"
@@ -14,7 +14,7 @@ http://localhost:3000/user/profile/password PUT
 },
 
 
-http://localhost:3000/user/signup POST
+http://localhost:3000/user/signup POST DONE
 takes body as request 
 {
 "name": "Masab",
@@ -28,7 +28,7 @@ takes body as request
 },
 
 
-http://localhost:3000/candidate/signup POST 
+http://localhost:3000/candidate/signup POST  DONE
 takes body as request 
  {
 "name": "Imran Khan",
@@ -37,11 +37,11 @@ takes body as request
 },
 
 
-http://localhost:3000/candidate/vote/count GET total votes for Party
+http://localhost:3000/candidate/vote/count GET total votes for Party DONE
 
 
 
-http://localhost:3000/candidate GET All Candidates 
+http://localhost:3000/candidate GET All Candidates  DONE
 
 
 http://localhost:3000/candidate/vote/id POST candidate ID to vote

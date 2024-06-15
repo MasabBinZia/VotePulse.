@@ -1,6 +1,7 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Form,
@@ -19,6 +20,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { LoaderCircle } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -33,18 +36,13 @@ const formSchema = z.object({
       message: "Age must be a number between 18 and 100.",
     }
   ),
-
   cnicNumber: z.string().refine(
     (value) => {
-      const cnicRegex = /^\d{5}-\d{7}-\d$/;
-      const numericValue = parseInt(value.replace(/-/g, ""), 10);
-      return (
-        cnicRegex.test(value) && !isNaN(numericValue) && value.length === 15
-      );
+      const cnicRegex = /^\d{12}$/;
+      return cnicRegex.test(value);
     },
     {
-      message:
-        "CNIC number must be in the format 12345-1234567-1 and contain exactly 13 digits.",
+      message: "CNIC number must contain exactly 12 digits.",
     }
   ),
   password: z.string().refine(
@@ -64,7 +62,7 @@ const formSchema = z.object({
       return mobileRegex.test(value);
     },
     {
-      message: "Mobile number must contain exactly 12 digits.",
+      message: "Mobile number must contain exactly 10 digits.",
     }
   ),
   email: z.string().email({
@@ -76,6 +74,8 @@ const formSchema = z.object({
 });
 
 export default function UserSignUpPage() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -88,18 +88,34 @@ export default function UserSignUpPage() {
       address: "",
     },
   });
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
+
+  const API_URL = "http://localhost:3001";
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      setLoading(true);
+      setError(null); // Reset error state
+      const res = await axios.post(`${API_URL}/user/signup`, values);
+      alert("User successfully signed up!"); // Alert on successful signup
+      return res.data;
+    } catch (error: any) {
+      console.log("Error during sign up:", error);
+      if (error.response?.status === 409) {
+        alert("User already exists!");
+      }
+      setError(error.response?.data?.error || "An unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="flex justify-center items-center py-20">
-      {/* <AuthForm formType={"Voter"} /> */}
-
       <Card className="w-1/2 ">
         <CardHeader>
           <CardTitle>Sign Up</CardTitle>
           <CardDescription>
-            You can signup into the e-voting app buy filling these basic info.
+            You can signup into the e-voting app by filling these basic info.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -131,7 +147,6 @@ export default function UserSignUpPage() {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="mobileNumber"
@@ -139,7 +154,7 @@ export default function UserSignUpPage() {
                   <FormItem>
                     <FormLabel>Mobile Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="+92-1234567891" {...field} />
+                      <Input placeholder="1234567891" {...field} />
                     </FormControl>
                     <FormMessage className="font-bold" />
                   </FormItem>
@@ -194,15 +209,23 @@ export default function UserSignUpPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input placeholder="********" {...field} />
+                      <Input
+                        placeholder="********"
+                        {...field}
+                        type="password"
+                      />
                     </FormControl>
                     <FormMessage className="font-bold" />
                   </FormItem>
                 )}
               />
-
+              {error && <p className="text-red-500">{error}</p>}
               <Button type="submit" className="w-full my-4">
-                Sign Up
+                {loading ? (
+                  <LoaderCircle className="animate-spin" />
+                ) : (
+                  "Sign Up"
+                )}
               </Button>
               <Link
                 className={`${buttonVariants({

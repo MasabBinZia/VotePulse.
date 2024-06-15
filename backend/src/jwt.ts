@@ -4,16 +4,24 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const jwtAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  // Checking Authorized or not
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    userName?: string; // Add other JWT payload properties as needed
+  };
+}
+
+const jwtAuthMiddleware = (req: any, res: Response, next: NextFunction) => {
   const authorization = req.headers.authorization;
-  if (!authorization) return res.status(401).json({ error: "Unauthorized" });
+  if (!authorization) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
-  // Extract JWT token from the req headers
   const token = authorization.split(" ")[1];
-  if (!token) return res.status(401).json({ error: "Unauthorized" });
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
-  // Ensure JWT_SECRET is defined
   const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret) {
     console.error("JWT_SECRET is not defined");
@@ -21,23 +29,21 @@ const jwtAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
   }
 
   try {
-    // Verify JWT token
-    const decoded = jwt.verify(token, jwtSecret);
-    (req as any).user = decoded;
+    const decoded = jwt.verify(token, jwtSecret) as jwt.JwtPayload;
+    req.user = decoded;
     next();
   } catch (err) {
-    console.log(err);
-    res.status(401).json({ error: "Invalid token" });
+    console.error("Error verifying token:", err);
+    return res.status(401).json({ error: "Invalid token" });
   }
 };
 
 const generateToken = (userData: object): string => {
-  if (!process.env.JWT_SECRET) {
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
     throw new Error("JWT_SECRET is not defined");
   }
-  return jwt.sign(userData, process.env.JWT_SECRET, {
-    expiresIn: "30000",
-  });
+  return jwt.sign(userData, jwtSecret, { expiresIn: "1h" });
 };
 
 export { jwtAuthMiddleware, generateToken };
