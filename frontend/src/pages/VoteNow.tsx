@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -10,51 +9,35 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Candidate } from "@/utils/types/types";
+import { useQuery } from "@tanstack/react-query";
+import { BASE_URL } from "../../envConstants";
+import SkeletonLoader from "@/components/skeletonLoader";
+import { LoaderCircle } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
-type Candidate = {
-  _id: string;
-  name: string;
-  party: string;
-};
-
-const BASE_URL = "http://localhost:3001"; // Replace with your base URL
+const URL = `${BASE_URL}/candidate`;
 
 export default function VoteNow() {
-  const [candidates, setCandidates] = useState<Candidate[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [voting, setVoting] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  const navigate = useNavigate();
-
-  let candidateID = "666da6617b7e712222e9cdfe";
-
-  useEffect(() => {
-    const fetchCandidates = async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/candidate`);
-        setCandidates(res.data);
-      } catch (error) {
-        setError("Error loading candidates.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/user-login");
-    } else {
-      fetchCandidates();
-    }
-  }, [navigate]);
+  const {
+    data: candidates,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["candidates"],
+    queryFn: () => axios.get(URL).then((res) => res.data),
+  });
 
   const handleVote = async (candidateId: string) => {
     try {
       setVoting(candidateId);
+
       const token = localStorage.getItem("token");
       await axios.post(
-        `${BASE_URL}/candidate/vote/666da6617b7e712222e9cdfe`,
+        `${BASE_URL}/candidate/vote/${candidateId}`,
         {},
         {
           headers: {
@@ -62,50 +45,69 @@ export default function VoteNow() {
           },
         }
       );
-      alert("Vote recorded successfully!");
+      toast({
+        variant: "default",
+        description: "Vote recorded successfully!",
+      });
     } catch (error) {
       console.error("Error voting for candidate:", error);
-      alert("Failed to record vote.");
+      toast({
+        variant: "destructive",
+        description: "Already Voted OR Failed to record vote!",
+      });
     } finally {
       setVoting(null);
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (error) return <p> Error Fetching data</p>;
 
   return (
     <main className="flex flex-col items-center py-20">
       <h1 className="text-4xl font-bold text-center">Vote for a Candidate</h1>
       <section className="w-[600px] py-12 flex justify-center items-center">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="font-medium text-center">
-                Candidate Name
-              </TableHead>
-              <TableHead className="font-medium text-center">Party</TableHead>
-              <TableHead className="font-medium text-center">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {candidates.map((candidate, idx) => (
-              <TableRow key={idx}>
-                <TableCell className="text-center">{candidate.name}</TableCell>
-                <TableCell className="text-center">{candidate.party}</TableCell>
-                <TableCell className="text-center">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleVote(candidateID)}
-                    disabled={voting === candidateID}
-                  >
-                    {voting === candidateID ? "Voting..." : "Vote"}
-                  </Button>
-                </TableCell>
+        {isLoading ? (
+          <SkeletonLoader count={8} className="h-12 w-[600px] bg-gray-300" />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="font-medium text-center">
+                  Candidate Name
+                </TableHead>
+                <TableHead className="font-medium text-center">Party</TableHead>
+                <TableHead className="font-medium text-center">
+                  Action
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {candidates.map((candidate: Candidate, idx: number) => (
+                <TableRow key={idx}>
+                  <TableCell className="text-center">
+                    {candidate.name}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {candidate.party}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Button
+                      variant="outline"
+                      onClick={() => handleVote(candidate._id)}
+                      disabled={voting === candidate._id}
+                    >
+                      {voting === candidate._id ? (
+                        <LoaderCircle className="animate-spin" />
+                      ) : (
+                        "Vote"
+                      )}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </section>
     </main>
   );

@@ -16,7 +16,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/profile",
-    element: <Profile />,
+    element: (
+      <ProtectedRoute>
+        <Profile />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/candidates",
@@ -48,6 +52,6 @@ export const router = createBrowserRouter([
   },
   {
     path: "/votes",
-    element: <Votes/>,
+    element: <Votes />,
   },
 ]);

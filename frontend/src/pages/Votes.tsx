@@ -1,6 +1,5 @@
 import { BASE_URL } from "../../envConstants";
 import { useQuery } from "@tanstack/react-query";
-
 import {
   Table,
   TableBody,
@@ -9,25 +8,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import SkeletonLoader from "@/components/skeletonLoader";
+import axios from "axios";
+import { VoteRecord } from "@/utils/types/types";
 
 const URL = `${BASE_URL}/candidate/vote/count`;
 
-type VoteRecord = {
-  party: string;
-  count: number;
-};
-
 export default function Votes() {
-  const { data, isLoading, error } = useQuery({
+  const {
+    data = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["votes"],
-    queryFn: () => fetch(URL).then((res) => res.json()),
+    queryFn: () => axios.get(URL).then((res) => res.data),
   });
 
-  if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error loading votes.</p>;
 
-  // Sort data in ascending order according to the vote count
-  const sortedData = [...data].sort((a: VoteRecord, b: VoteRecord) => a.count - b.count);
+  const sortedData = [...data].sort(
+    (a: VoteRecord, b: VoteRecord) => b.count - a.count
+  );
 
   return (
     <main className="flex flex-col items-center py-20">
@@ -36,28 +37,34 @@ export default function Votes() {
       </h1>
 
       <section className="w-[400px] py-12 flex justify-center items-center">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="font-medium text-center">No.</TableHead>
-              <TableHead className="font-medium text-center">
-                Party
-              </TableHead>
-              <TableHead className="font-medium text-center">
-                Vote Count
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedData.map((voteRecord: VoteRecord, idx: number) => (
-              <TableRow key={idx}>
-                <TableCell className="text-center">{idx + 1}</TableCell>
-                <TableCell className="text-center">{voteRecord.party}</TableCell>
-                <TableCell className="text-center">{voteRecord.count}</TableCell>
+        {isLoading ? (
+          <SkeletonLoader count={8} className="h-8 w-[400px] bg-gray-300" />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="font-medium text-center">No.</TableHead>
+                <TableHead className="font-medium text-center">Party</TableHead>
+                <TableHead className="font-medium text-center">
+                  Vote Count
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {sortedData.map((voteRecord: VoteRecord, idx: number) => (
+                <TableRow key={idx}>
+                  <TableCell className="text-center">{idx + 1}</TableCell>
+                  <TableCell className="text-center">
+                    {voteRecord.party}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {voteRecord.count}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </section>
     </main>
   );

@@ -7,6 +7,7 @@ import { SiteHeader } from "./components/Header";
 import AuthProvider from "./Providers/AuthProvider";
 import { router } from "./utils/router";
 import { queryClient } from "./utils/query-client";
+import { Toaster } from "./components/ui/toaster";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -14,6 +15,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <AuthProvider>
         <SiteHeader />
         <RouterProvider router={router} />
+        <Toaster />
       </AuthProvider>
     </QueryClientProvider>
   </React.StrictMode>

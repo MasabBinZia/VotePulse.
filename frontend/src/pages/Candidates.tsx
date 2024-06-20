@@ -9,21 +9,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import SkeletonLoader from "@/components/skeletonLoader";
+import axios from "axios";
+import { Candidate } from "@/utils/types/types";
 
 const URL = `${BASE_URL}/candidate`;
-
-type Candidate = {
-  name: string;
-  party: string;
-};
 
 export default function CandidatesPage() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["candidates"],
-    queryFn: () => fetch(URL).then((res) => res.json()),
+    queryFn: () => axios.get(URL).then((res) => res.data),
   });
 
-  if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error loading candidates.</p>;
 
   return (
@@ -31,30 +28,37 @@ export default function CandidatesPage() {
       <h1 className="text-4xl font-bold text-center">
         List Of Candidates Available to Vote
       </h1>
-
       <section className="w-[400px] py-12 flex justify-center items-center">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="font-medium text-center">No.</TableHead>
-              <TableHead className="font-medium text-center">
-                Candidate Name
-              </TableHead>
-              <TableHead className="font-medium text-center">
-                Candidate Party
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((candidate: Candidate, idx: number) => (
-              <TableRow key={idx}>
-                <TableCell className="text-center">{idx + 1}</TableCell>
-                <TableCell className="text-center">{candidate.name}</TableCell>
-                <TableCell className="text-center">{candidate.party}</TableCell>
+        {isLoading ? (
+          <SkeletonLoader count={8} className="h-8 w-[400px] bg-gray-300" />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="font-medium text-center">No.</TableHead>
+                <TableHead className="font-medium text-center">
+                  Candidate Name
+                </TableHead>
+                <TableHead className="font-medium text-center">
+                  Candidate Party
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {data.map((candidate: Candidate, idx: number) => (
+                <TableRow key={idx}>
+                  <TableCell className="text-center">{idx + 1}</TableCell>
+                  <TableCell className="text-center">
+                    {candidate.name}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {candidate.party}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </section>
     </main>
   );

@@ -16,14 +16,14 @@ export default function Hero() {
           <a href="/vote" className={cn(buttonVariants({ size: "lg" }))}>
             Vote Now
           </a>
-          <a
+          {/* <a
             href={""}
             target="_blank"
             rel="noreferrer"
             className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
           >
             Admin Login
-          </a>
+          </a> */}
         </div>
       </div>
     </section>

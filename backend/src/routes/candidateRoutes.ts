@@ -142,7 +142,7 @@ router.get("/vote/count", async (req: Request, res: Response) => {
 // Get All Candidates
 router.get("/", async (req: Request, res: Response) => {
   try {
-    const candidates = await Candidate.find({}, "name party -_id");
+    const candidates = await Candidate.find({}, "name party age voteCount _id");
     res.status(200).json(candidates);
   } catch (err) {
     console.error(err);

@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-const formSchema = z.object({
+const userLoginformSchema = z.object({
   cnicNumber: z.string().refine(
     (value) => {
       const cnicRegex = /^\d{12}$/;
@@ -46,14 +46,16 @@ import {
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function UserLoginPage() {
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof userLoginformSchema>>({
+    resolver: zodResolver(userLoginformSchema),
     defaultValues: {
       cnicNumber: "",
       password: "",
@@ -62,19 +64,24 @@ export default function UserLoginPage() {
 
   const API_URL = "http://localhost:3001";
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof userLoginformSchema>) => {
     try {
       setLoading(true);
-      setError(null); // Reset error state
+      setError(null);
       const res = await axios.post(`${API_URL}/user/login`, values);
       const { token } = res.data;
-      console.log(token);
-
       localStorage.setItem("token", token);
-      alert("Login successful!");
+      toast({
+        variant: "default",
+        description: "Login Successfully.",
+      });
       navigate("/");
     } catch (error: any) {
       console.error("Error during login:", error);
+      toast({
+        variant: "destructive",
+        description: "Can't Login Try again!",
+      });
       setError(error.response?.data?.error || "An unexpected error occurred");
     } finally {
       setLoading(false);

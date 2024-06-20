@@ -22,62 +22,13 @@ import {
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { LoaderCircle } from "lucide-react";
-
-const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-  age: z.string().refine(
-    (value) => {
-      const numericValue = parseInt(value, 10);
-      return !isNaN(numericValue) && numericValue >= 18 && numericValue <= 100;
-    },
-    {
-      message: "Age must be a number between 18 and 100.",
-    }
-  ),
-  cnicNumber: z.string().refine(
-    (value) => {
-      const cnicRegex = /^\d{12}$/;
-      return cnicRegex.test(value);
-    },
-    {
-      message: "CNIC number must contain exactly 12 digits.",
-    }
-  ),
-  password: z.string().refine(
-    (value) => {
-      const passwordRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-      return passwordRegex.test(value);
-    },
-    {
-      message:
-        "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one special character (@$!%*?&).",
-    }
-  ),
-  mobileNumber: z.string().refine(
-    (value) => {
-      const mobileRegex = /^\d{10}$/;
-      return mobileRegex.test(value);
-    },
-    {
-      message: "Mobile number must contain exactly 10 digits.",
-    }
-  ),
-  email: z.string().email({
-    message: "Invalid email format.",
-  }),
-  address: z.string().max(200, {
-    message: "Address must not exceed 200 characters.",
-  }),
-});
+import { userSignupFormSchema } from "@/utils/formsSchema";
 
 export default function UserSignUpPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof userSignupFormSchema>>({
+    resolver: zodResolver(userSignupFormSchema),
     defaultValues: {
       name: "",
       age: "",
@@ -91,11 +42,22 @@ export default function UserSignUpPage() {
 
   const API_URL = "http://localhost:3001";
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof userSignupFormSchema>) => {
     try {
       setLoading(true);
       setError(null); // Reset error state
-      const res = await axios.post(`${API_URL}/user/signup`, values);
+
+      const formattedValues = {
+        ...values,
+        age: parseInt(values.age), // Convert age to number
+      };
+
+      const res = await axios.post(`${API_URL}/user/signup`, formattedValues, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
       alert("User successfully signed up!"); // Alert on successful signup
       return res.data;
     } catch (error: any) {
@@ -111,7 +73,7 @@ export default function UserSignUpPage() {
 
   return (
     <main className="flex justify-center items-center py-20">
-      <Card className="w-1/2 ">
+      <Card className="w-1/2">
         <CardHeader>
           <CardTitle>Sign Up</CardTitle>
           <CardDescription>
@@ -126,7 +88,7 @@ export default function UserSignUpPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>FullName</FormLabel>
+                    <FormLabel>Full Name</FormLabel>
                     <FormControl>
                       <Input placeholder="Masab Bin Zia" {...field} />
                     </FormControl>
@@ -167,7 +129,7 @@ export default function UserSignUpPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="axas@gmail.com" {...field} />
+                      <Input placeholder="example@gmail.com" {...field} />
                     </FormControl>
                     <FormMessage className="font-bold" />
                   </FormItem>
@@ -196,7 +158,7 @@ export default function UserSignUpPage() {
                   <FormItem>
                     <FormLabel>CNIC Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="12345-1234567-1" {...field} />
+                      <Input placeholder="123456789012" {...field} />
                     </FormControl>
                     <FormMessage className="font-bold" />
                   </FormItem>

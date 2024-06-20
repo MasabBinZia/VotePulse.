@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-
 import {
   Dialog,
   DialogContent,
@@ -25,44 +23,40 @@ import {
 } from "@/components/ui/form";
 import { LoaderCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { useQuery } from "@tanstack/react-query";
+import { UserProfile } from "@/utils/types/types";
 
-type UserProfile = {
-  id: string;
-  name: string;
-  cnicNumber: string;
-  email: string;
-  age: number;
-  mobileNumber: string;
-  address: string;
-  role: string;
-  isVoted: boolean;
-};
+import { BASE_URL } from "../../envConstants";
+import { CandidateFormData, candidateSchema } from "@/utils/formsSchema";
 
-const candidateSchema = z.object({
-  name: z
-    .string()
-    .min(2, { message: "Name must be at least 2 characters long." }),
-  party: z
-    .string()
-    .min(2, { message: "Party must be at least 2 characters long." }),
-  age: z.string().refine(
-    (value) => {
-      const numericValue = parseInt(value, 10);
-      return !isNaN(numericValue) && numericValue >= 18 && numericValue <= 100;
-    },
-    {
-      message: "Age must be a number between 18 and 100.",
-    }
-  ),
-});
-
-type CandidateFormData = z.infer<typeof candidateSchema>;
+const URL = `${BASE_URL}/user/profile`;
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(false);
   const [registering, setRegistering] = useState(false);
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+
+  const { data, isLoading, error } = useQuery<UserProfile>({
+    queryKey: ["userdata"],
+    queryFn: () =>
+      axios
+        .get(URL, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => res.data.user),
+  });
+
+  const user = data;
 
   const form = useForm<CandidateFormData>({
     resolver: zodResolver(candidateSchema),
@@ -73,37 +67,9 @@ export default function ProfilePage() {
     },
   });
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/user-login");
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const res = await axios.get("http://localhost:3001/user/profile", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUser(res.data.user);
-        console.log(res.data);
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [navigate]);
-
   const onSubmit = async (data: CandidateFormData) => {
     setRegistering(true);
     try {
-      const token = localStorage.getItem("token");
       if (!token) {
         navigate("/user-login");
         return;
@@ -118,6 +84,7 @@ export default function ProfilePage() {
           },
         }
       );
+      console.log(res);
     } catch (error) {
       console.error("Error registering candidate:", error);
       alert("Failed to register candidate.");
@@ -126,109 +93,136 @@ export default function ProfilePage() {
     }
   };
 
-  if (loading) {
-    return <p>Loading...</p>;
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-40">
+        <LoaderCircle className="animate-spin h-20 w-20" />
+      </div>
+    );
   }
 
-  if (!user) {
+  if (error) {
     return <p>No user data available.</p>;
   }
 
   return (
     <main className="flex flex-col justify-center items-center py-20">
-      <div className="w-1/2 bg-white p-8 shadow-md rounded mb-8">
-        <h1 className="text-2xl font-bold mb-4">User Profile</h1>
-        <p>
-          <strong>Name:</strong> {user.name}
-        </p>
-        <p>
-          <strong>CNIC Number:</strong> {user.cnicNumber}
-        </p>
-        <p>
-          <strong>Email:</strong> {user.email}
-        </p>
-        <p>
-          <strong>Age:</strong> {user.age}
-        </p>
-        <p>
-          <strong>Mobile Number:</strong> {user.mobileNumber}
-        </p>
-        <p>
-          <strong>Address:</strong> {user.address}
-        </p>
-        <p>
-          <strong>Role:</strong> {user.role}
-        </p>
-        <p>
-          <strong>Voted:</strong> {user.isVoted}
-        </p>
-      </div>
-
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline">Register Candidate</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Register Candidate</DialogTitle>
-            <DialogDescription>
-              Enter candidate details to register.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Candidate Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Candidate Name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="party"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Party</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Party" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="age"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Age</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Age" type="number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <DialogFooter>
-                <Button type="submit" className="w-full" disabled={registering}>
-                  {registering ? (
-                    <LoaderCircle className="animate-spin" />
-                  ) : (
-                    "Register"
+      <Card className="w-1/2 my-4">
+        <CardHeader>
+          <CardTitle>Your Info</CardTitle>
+          <CardDescription>
+            Here is all the necessary info of the user.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-2">
+            <Label className="font-bold text-lg">Name :</Label>
+            <p>{user?.name}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label className="font-bold text-lg">CNIC Number :</Label>
+            <p>{user?.cnicNumber}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label className="font-bold text-lg">Email :</Label>
+            <p>{user?.email}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label className="font-bold text-lg">Age :</Label>
+            <p>{user?.age}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label className="font-bold text-lg">Mobile Number :</Label>
+            <p>{user?.mobile}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label className="font-bold text-lg">Address :</Label>
+            <p>{user?.address}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label className="font-bold text-lg">Role :</Label>
+            <p>{user?.role}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label className="font-bold text-lg">Voted :</Label>
+            <p>{user?.isVoted === false ? "No" : "Yes"}</p>
+          </div>
+        </CardContent>
+      </Card>
+      {user?.role === "admin" && (
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Register Candidate</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Register Candidate</DialogTitle>
+              <DialogDescription>
+                Enter candidate details to register.
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...form}>
+              <form
+                className="space-y-4"
+                onSubmit={form.handleSubmit(onSubmit)}
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Candidate Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Candidate Name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+                />
+                <FormField
+                  control={form.control}
+                  name="party"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Party</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Party" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="age"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Age</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Age" type="number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <DialogFooter>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={registering}
+                  >
+                    {registering ? (
+                      <LoaderCircle className="animate-spin" />
+                    ) : (
+                      "Register"
+                    )}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      )}
     </main>
   );
 }
