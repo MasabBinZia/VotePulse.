@@ -36,6 +36,7 @@ import { UserProfile } from "@/utils/types/types";
 
 import { BASE_URL } from "../../envConstants";
 import { CandidateFormData, candidateSchema } from "@/utils/formsSchema";
+import ForgetPasswordDialog from "@/components/forget-pass-dialog";
 
 const URL = `${BASE_URL}/user/profile`;
 
@@ -84,7 +85,6 @@ export default function ProfilePage() {
           },
         }
       );
-      console.log(res);
     } catch (error) {
       console.error("Error registering candidate:", error);
       alert("Failed to register candidate.");
@@ -223,6 +223,7 @@ export default function ProfilePage() {
           </DialogContent>
         </Dialog>
       )}
+      <ForgetPasswordDialog />
     </main>
   );
 }

@@ -73,7 +73,7 @@ router.get("/profile", jwtAuthMiddleware, async (req: AuthenticatedRequest, res:
   }
 });
 
-// Forget Password
+// Change Password
 router.put("/profile/password", jwtAuthMiddleware, async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.user?.id;
   if (!userId) {

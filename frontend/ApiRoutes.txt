@@ -44,10 +44,10 @@ http://localhost:3000/candidate/vote/count GET total votes for Party DONE
 http://localhost:3000/candidate GET All Candidates  DONE
 
 
-http://localhost:3000/candidate/vote/id POST candidate ID to vote
+http://localhost:3000/candidate/vote/id POST candidate ID to vote DONE
 
 
-http://localhost:3000/candidate/id PUT to update candidate
+http://localhost:3000/candidate/id PUT to update candidate 
 
 http://localhost:3000/candidate/id DELETE to delete candidate
 

@@ -23,10 +23,12 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { LoaderCircle } from "lucide-react";
 import { userSignupFormSchema } from "@/utils/formsSchema";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function UserSignUpPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof userSignupFormSchema>>({
     resolver: zodResolver(userSignupFormSchema),
     defaultValues: {
@@ -45,11 +47,11 @@ export default function UserSignUpPage() {
   const onSubmit = async (values: z.infer<typeof userSignupFormSchema>) => {
     try {
       setLoading(true);
-      setError(null); // Reset error state
+      setError(null);
 
       const formattedValues = {
         ...values,
-        age: parseInt(values.age), // Convert age to number
+        age: parseInt(values.age),
       };
 
       const res = await axios.post(`${API_URL}/user/signup`, formattedValues, {
@@ -57,17 +59,27 @@ export default function UserSignUpPage() {
           "Content-Type": "application/json",
         },
       });
-
-      alert("User successfully signed up!"); // Alert on successful signup
+      toast({
+        variant: "default",
+        description: "User successfully signed up!",
+      });
       return res.data;
     } catch (error: any) {
-      console.log("Error during sign up:", error);
+      toast({
+        variant: "destructive",
+        description: "Can't Login Try again!",
+      });
       if (error.response?.status === 409) {
         alert("User already exists!");
+        toast({
+          variant: "destructive",
+          description: "User already exists!",
+        });
       }
       setError(error.response?.data?.error || "An unexpected error occurred");
     } finally {
       setLoading(false);
+      form.reset()
     }
   };
 

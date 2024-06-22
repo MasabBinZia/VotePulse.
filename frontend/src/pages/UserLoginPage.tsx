@@ -47,6 +47,8 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { LoaderCircle } from "lucide-react";
+import ForgetPasswordDialog from "@/components/forget-pass-dialog";
 
 export default function UserLoginPage() {
   const [loading, setLoading] = useState(false);
@@ -75,6 +77,7 @@ export default function UserLoginPage() {
         variant: "default",
         description: "Login Successfully.",
       });
+      form.reset();
       navigate("/");
     } catch (error: any) {
       console.error("Error during login:", error);
@@ -131,10 +134,16 @@ export default function UserLoginPage() {
                 )}
               />
               {error && <p className="text-red-500">{error}</p>}
-              <p>Forget Password ?</p>
+              {/* <Button onClick={() => navigate("/party")} variant={"link"}>
+                Forget Password ?
+              </Button> */}
               <div className="gap-2 flex flex-col justify-center items-center">
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Loading..." : "Login"}
+                  {loading ? (
+                    <LoaderCircle className="animate-spin" />
+                  ) : (
+                    "Login"
+                  )}
                 </Button>
                 <Link
                   className={`${buttonVariants({

@@ -83,4 +83,26 @@ export const userSignupFormSchema = z.object({
   }),
 });
 
+
+export const ForgetPassFormSchema = z.object({
+  currentPassword: z.string().min(2, {
+    message: "Enter Correct Password",
+  }),
+  newPassword: z.string().refine(
+    (value) => {
+      const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      return passwordRegex.test(value);
+    },
+    {
+      message:
+        "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one special character (@$!%*?&).",
+    }
+  ),
+});
+
+
 export type CandidateFormData = z.infer<typeof candidateSchema>;
+
+
+

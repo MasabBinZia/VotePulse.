@@ -36,6 +36,8 @@ export default function VoteNow() {
       setVoting(candidateId);
 
       const token = localStorage.getItem("token");
+      console.log(token);
+
       await axios.post(
         `${BASE_URL}/candidate/vote/${candidateId}`,
         {},
