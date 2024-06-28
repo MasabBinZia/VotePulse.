@@ -1,4 +1,3 @@
-import { BASE_URL } from "../../envConstants";
 import { useQuery } from "@tanstack/react-query";
 import {
   Table,
@@ -11,6 +10,7 @@ import {
 import SkeletonLoader from "@/components/skeletonLoader";
 import axios from "axios";
 import { VoteRecord } from "@/utils/types/types";
+import { BASE_URL } from "../../envConstants";
 
 const URL = `${BASE_URL}/candidate/vote/count`;
 
@@ -24,7 +24,7 @@ export default function Votes() {
     queryFn: () => axios.get(URL).then((res) => res.data),
   });
 
-  if (error) return <p>Error loading votes.</p>;
+  if (error) return <p className="flex font-bold py-20 justify-center items-center text-4xl text-primary">Error loading votes.</p>;
 
   const sortedData = [...data].sort(
     (a: VoteRecord, b: VoteRecord) => b.count - a.count
@@ -33,7 +33,7 @@ export default function Votes() {
   return (
     <main className="flex flex-col items-center py-20">
       <h1 className="text-4xl font-bold text-center">
-        List Of Parties According to Their Votes
+        List Of <span className="text-primary">Parties</span> According to Their Votes.
       </h1>
 
       <section className="w-[400px] py-12 flex justify-center items-center">

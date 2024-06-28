@@ -2,30 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-
-const userLoginformSchema = z.object({
-  cnicNumber: z.string().refine(
-    (value) => {
-      const cnicRegex = /^\d{12}$/;
-      return cnicRegex.test(value);
-    },
-    {
-      message: "CNIC number must contain exactly 12 digits.",
-    }
-  ),
-  password: z.string().min(2, {
-    message: "Enter Correct Password",
-  }),
-});
-
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Form,
@@ -47,13 +23,31 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { LoaderCircle } from "lucide-react";
-import ForgetPasswordDialog from "@/components/forget-pass-dialog";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+
+import { BASE_URL } from "../../envConstants";
+
+const URL = `${BASE_URL}/candidate/vote/count`;
+
+const userLoginformSchema = z.object({
+  cnicNumber: z.string().refine(
+    (value) => {
+      const cnicRegex = /^\d{12}$/;
+      return cnicRegex.test(value);
+    },
+    {
+      message: "CNIC number must contain exactly 12 digits.",
+    }
+  ),
+  password: z.string().min(2, {
+    message: "Enter Correct Password",
+  }),
+});
 
 export default function UserLoginPage() {
-  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState("password");
   const { toast } = useToast();
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof userLoginformSchema>>({
@@ -63,32 +57,50 @@ export default function UserLoginPage() {
       password: "",
     },
   });
+  type ErrorType = {
+    response: {
+      status: number;
+    };
+  };
 
-  const API_URL = "http://localhost:3001";
-
-  const onSubmit = async (values: z.infer<typeof userLoginformSchema>) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await axios.post(`${API_URL}/user/login`, values);
+  const mutation = useMutation({
+    mutationFn: async (values: z.infer<typeof userLoginformSchema>) => {
+      const res = await axios.post(`${URL}/user/login`, values);
       const { token } = res.data;
       localStorage.setItem("token", token);
+      return res.data;
+    },
+    onSuccess: () => {
       toast({
         variant: "default",
         description: "Login Successfully.",
       });
       form.reset();
       navigate("/");
-    } catch (error: any) {
+    },
+    onError: (error: ErrorType) => {
       console.error("Error during login:", error);
       toast({
         variant: "destructive",
         description: "Can't Login Try again!",
       });
-      setError(error.response?.data?.error || "An unexpected error occurred");
-    } finally {
-      setLoading(false);
-    }
+      if (error.response?.status === 409) {
+        toast({
+          variant: "destructive",
+          description: "User already exists!",
+        });
+      }
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof userLoginformSchema>) => {
+    mutation.mutate(values);
+  };
+
+  const ShowPassWordHandler = () => {
+    setShowPassword((prevState) =>
+      prevState === "password" ? "text" : "password"
+    );
   };
 
   return (
@@ -126,20 +138,38 @@ export default function UserLoginPage() {
                       <Input
                         placeholder="*********"
                         {...field}
-                        type="password"
+                        type={showPassword}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              {error && <p className="text-red-500">{error}</p>}
-              {/* <Button onClick={() => navigate("/party")} variant={"link"}>
-                Forget Password ?
-              </Button> */}
+
+              <p
+                className={`${buttonVariants()} gap-2 flex items-center justify-center cursor-pointer`}
+                onClick={ShowPassWordHandler}
+              >
+                {showPassword === "password" ? <Eye /> : <EyeOff />}
+                {showPassword === "password"
+                  ? "Show Password"
+                  : "Hide Password"}
+              </p>
+
+              {mutation.isError && (
+                <p className="text-red-500">
+                  {(mutation.error as any)?.response?.data?.error ||
+                    "An unexpected error occurred"}
+                </p>
+              )}
+
               <div className="gap-2 flex flex-col justify-center items-center">
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? (
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={mutation.isPending}
+                >
+                  {mutation.isPending ? (
                     <LoaderCircle className="animate-spin" />
                   ) : (
                     "Login"

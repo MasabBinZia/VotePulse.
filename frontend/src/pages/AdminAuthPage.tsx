@@ -1,4 +1,3 @@
-import AuthForm from "@/components/auth-form";
 import { Button } from "@/components/ui/button";
 import {
   Card,

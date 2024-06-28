@@ -25,11 +25,15 @@ import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { ForgetPassFormSchema } from "@/utils/formsSchema";
+import { useMutation } from "@tanstack/react-query";
+
+const API_URL = "http://localhost:3001";
 
 const ForgetPasswordDialog = () => {
   const [loading, setLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
+  const token = localStorage.getItem("token");
 
   const ForgetPassForm = useForm<z.infer<typeof ForgetPassFormSchema>>({
     resolver: zodResolver(ForgetPassFormSchema),
@@ -39,37 +43,35 @@ const ForgetPasswordDialog = () => {
     },
   });
 
-  const API_URL = "http://localhost:3001";
-
-  const onSubmitForgetPass = async (
-    values: z.infer<typeof ForgetPassFormSchema>
-  ) => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem("token");
-
-      const res = await axios.put(`${API_URL}/user/profile/password`, values, {
+  const mutation = useMutation({
+    mutationFn: (forgetpass: z.infer<typeof ForgetPassFormSchema>) => {
+      return axios.put(`${API_URL}/user/profile/password`, forgetpass, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Password changed successfully",
+        description: "Your password has been updated.",
+      });
+      setIsDialogOpen(false);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "There was an error changing your password.",
+      });
+    },
+  });
 
-      toast({
-        variant: "default",
-        description: "Changed Successfully.",
-      });
-      ForgetPassForm.reset();
-      setIsDialogOpen(false); // Close the dialog
-    } catch (error: any) {
-      console.error("Error during changing password:", error);
-      toast({
-        variant: "destructive",
-        description: "Can't Change Password!",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const onSubmit = ForgetPassForm.handleSubmit((data) => {
+    setLoading(true);
+    mutation.mutate(data, {
+      onSettled: () => setLoading(false),
+    });
+  });
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -86,10 +88,7 @@ const ForgetPasswordDialog = () => {
           </DialogDescription>
         </DialogHeader>
         <Form {...ForgetPassForm}>
-          <form
-            className="space-y-4"
-            onSubmit={ForgetPassForm.handleSubmit(onSubmitForgetPass)}
-          >
+          <form className="space-y-4" onSubmit={onSubmit}>
             <FormField
               control={ForgetPassForm.control}
               name="currentPassword"
@@ -116,7 +115,6 @@ const ForgetPasswordDialog = () => {
                 </FormItem>
               )}
             />
-
             <DialogFooter>
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? (

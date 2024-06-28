@@ -20,14 +20,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { useState } from "react";
 import { LoaderCircle } from "lucide-react";
 import { userSignupFormSchema } from "@/utils/formsSchema";
 import { useToast } from "@/components/ui/use-toast";
+import { useMutation } from "@tanstack/react-query";
+
+import { BASE_URL } from "../../envConstants";
+
+const URL = `${BASE_URL}/candidate/vote/count`;
 
 export default function UserSignUpPage() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const form = useForm<z.infer<typeof userSignupFormSchema>>({
     resolver: zodResolver(userSignupFormSchema),
@@ -42,45 +44,49 @@ export default function UserSignUpPage() {
     },
   });
 
-  const API_URL = "http://localhost:3001";
+  type ErrorType = {
+    response: {
+      status: number;
+    };
+  };
 
-  const onSubmit = async (values: z.infer<typeof userSignupFormSchema>) => {
-    try {
-      setLoading(true);
-      setError(null);
-
+  const mutation = useMutation({
+    mutationFn: async (values: z.infer<typeof userSignupFormSchema>) => {
       const formattedValues = {
         ...values,
         age: parseInt(values.age),
       };
 
-      const res = await axios.post(`${API_URL}/user/signup`, formattedValues, {
+      const res = await axios.post(`${URL}/user/signup`, formattedValues, {
         headers: {
           "Content-Type": "application/json",
         },
       });
+      return res.data;
+    },
+    onSuccess: () => {
       toast({
         variant: "default",
         description: "User successfully signed up!",
       });
-      return res.data;
-    } catch (error: any) {
+      form.reset();
+    },
+    onError: (error: ErrorType) => {
       toast({
         variant: "destructive",
-        description: "Can't Login Try again!",
+        description: "Can't Signup, try again!",
       });
       if (error.response?.status === 409) {
-        alert("User already exists!");
         toast({
           variant: "destructive",
           description: "User already exists!",
         });
       }
-      setError(error.response?.data?.error || "An unexpected error occurred");
-    } finally {
-      setLoading(false);
-      form.reset()
-    }
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof userSignupFormSchema>) => {
+    mutation.mutate(values);
   };
 
   return (
@@ -193,9 +199,18 @@ export default function UserSignUpPage() {
                   </FormItem>
                 )}
               />
-              {error && <p className="text-red-500">{error}</p>}
-              <Button type="submit" className="w-full my-4">
-                {loading ? (
+              {mutation.isError && (
+                <p className="text-red-500">
+                  {(mutation.error as any)?.response?.data?.error ||
+                    "An unexpected error occurred"}
+                </p>
+              )}
+              <Button
+                type="submit"
+                className="w-full my-4"
+                disabled={mutation.isPending}
+              >
+                {mutation.isPending ? (
                   <LoaderCircle className="animate-spin" />
                 ) : (
                   "Sign Up"

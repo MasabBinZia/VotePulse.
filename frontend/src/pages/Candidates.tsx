@@ -21,12 +21,12 @@ export default function CandidatesPage() {
     queryFn: () => axios.get(URL).then((res) => res.data),
   });
 
-  if (error) return <p>Error loading candidates.</p>;
+  if (error) return <p className="flex font-bold py-20 justify-center items-center text-4xl text-primary">Error loading candidates.</p>;
 
   return (
     <main className="flex flex-col items-center py-20">
       <h1 className="text-4xl font-bold text-center">
-        List Of Candidates Available to Vote
+        List Of <span className="text-primary">Candidates</span> Available to Vote
       </h1>
       <section className="w-[400px] py-12 flex justify-center items-center">
         {isLoading ? (

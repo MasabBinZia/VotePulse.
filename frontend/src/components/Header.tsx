@@ -1,6 +1,6 @@
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { GithubIcon, User } from "lucide-react";
+import { GithubIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function SiteHeader() {
@@ -11,7 +11,8 @@ export function SiteHeader() {
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-1">
             <a
-              href=""
+              href="https://github.com/MasabBinZia/VotePulse."
+              target="_blank"
               className={cn(
                 buttonVariants({ size: "icon" }),
                 "w-10 h-10 p-1 rounded-full"
@@ -31,7 +32,7 @@ export function MainNav() {
   return (
     <div className="flex gap-6 md:gap-10">
       <a href="/" className="lg:mb-2.5">
-        <span className="inline-block text-2xl lg:text-4xl font-bold">
+        <span className="inline-block text-2xl lg:text-4xl font-bold text-primary">
           VotePulse.
         </span>
       </a>
@@ -42,13 +43,6 @@ export function MainNav() {
           className={"flex items-center text-lg font-medium "}
         >
           Candidates
-        </a>
-        <a
-          key={""}
-          href={"/party"}
-          className={"flex items-center text-lg font-medium "}
-        >
-          Party
         </a>
         <a
           key={""}
