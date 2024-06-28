@@ -1,6 +1,5 @@
 import { BASE_URL } from "../../envConstants";
 import { useQuery } from "@tanstack/react-query";
-
 import {
   Table,
   TableBody,
